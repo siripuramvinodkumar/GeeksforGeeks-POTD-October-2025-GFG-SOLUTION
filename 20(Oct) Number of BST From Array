@@ -1,0 +1,87 @@
+20. Number of BST From Array
+
+
+🧩 Problem Description
+You are given an integer array arr[] containing distinct elements. Your task is to return an array where the ith element denotes the number of unique BSTs formed when arr[i] is chosen as the root.
+
+In a Binary Search Tree (BST), all elements in the left subtree are smaller than the root, and all elements in the right subtree are greater than the root. The problem requires calculating how many structurally unique BSTs can be formed for each element when it serves as the root node.
+
+📘 Examples
+Example 1
+Input: arr[] = [2, 1, 3]
+Output: [1, 2, 2]
+Explanation: 
+- When 2 is root: left subtree has 1 element (1), right subtree has 1 element (3)
+  Number of BSTs = C(1) * C(1) = 1 * 1 = 1
+- When 1 is root: left subtree has 0 elements, right subtree has 2 elements (2, 3)
+  Number of BSTs = C(0) * C(2) = 1 * 2 = 2
+- When 3 is root: left subtree has 2 elements (1, 2), right subtree has 0 elements
+  Number of BSTs = C(2) * C(0) = 2 * 1 = 2
+Example 2
+Input: arr[] = [2, 1]
+Output: [1, 1]
+Explanation:
+- When 2 is root: left has 1 element (1), right has 0 elements
+  Number of BSTs = C(1) * C(0) = 1 * 1 = 1
+- When 1 is root: left has 0 elements, right has 1 element (2)
+  Number of BSTs = C(0) * C(1) = 1 * 1 = 1
+🔒 Constraints
+1
+≤
+arr.size()
+≤
+6
+1
+≤
+arr
+[
+i
+]
+≤
+15
+✅ My Approach
+The optimal solution uses Catalan Numbers combined with sorting and indexing to determine BST counts efficiently:
+
+Catalan Number with Dynamic Programming
+Sort and Index Mapping:
+
+Create pairs of (value, original_index) for each array element.
+Sort these pairs by value to determine relative ordering.
+After sorting, the position i tells us how many elements are smaller (left subtree size = i) and how many are larger (right subtree size = n - i - 1).
+Precompute Catalan Numbers:
+
+The nth Catalan number C(n) represents the number of structurally unique BSTs with n nodes.
+Use dynamic programming: C(n) = Σ(C(i) * C(n-i-1)) for i from 0 to n-1.
+Precompute all Catalan numbers from 0 to n.
+Calculate BST Count for Each Element:
+
+For element at sorted position i:
+Left subtree can have C(i) unique structures (i smaller elements)
+Right subtree can have C(n-i-1) unique structures (n-i-1 larger elements)
+Total BSTs with this element as root = C(i) * C(n-i-1)
+Map Back to Original Indices:
+
+Store results at original positions using the saved indices.
+📝 Time and Auxiliary Space Complexity
+Expected Time Complexity: O(n² + n log n), as we perform O(n²) operations to compute Catalan numbers using nested loops and O(n log n) for sorting the array. The overall complexity is dominated by the Catalan computation and sorting.
+Expected Auxiliary Space Complexity: O(n), as we use additional space for storing pairs (value, index), Catalan numbers array, and result array, all proportional to the input size.
+🧑‍💻 Code (C++)
+class Solution {
+public:
+    vector<int> countBSTs(vector<int>& arr) {
+        int n = arr.size();
+        vector<pair<int,int>> p(n);
+        for (int i = 0; i < n; i++) p[i] = {arr[i], i};
+        sort(p.begin(), p.end());
+        vector<long> c(n + 1);
+        c[0] = c[1] = 1;
+        for (int i = 2; i <= n; i++) {
+            for (int j = 0; j < i; j++) 
+                c[i] += c[j] * c[i - j - 1];
+        }
+        vector<int> res(n);
+        for (int i = 0; i < n; i++) 
+            res[p[i].second] = c[i] * c[n - i - 1];
+        return res;
+    }
+};
