@@ -1,0 +1,1 @@
+# GeeksforGeeks-POTD-October-2025-GFG-SOLUTION
